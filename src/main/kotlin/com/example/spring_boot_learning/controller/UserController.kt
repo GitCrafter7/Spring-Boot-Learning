@@ -1,6 +1,5 @@
 package com.example.spring_boot_learning.controller
 
-import com.example.spring_boot_learning.controller.AuthController.LoginRequest
 import com.example.spring_boot_learning.controller.utils.GenericResponse
 import com.example.spring_boot_learning.database.repository.UserRepository
 import com.example.spring_boot_learning.security.AuthService
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.security.Principal
 
 @RestController
 @RequestMapping("/profile")

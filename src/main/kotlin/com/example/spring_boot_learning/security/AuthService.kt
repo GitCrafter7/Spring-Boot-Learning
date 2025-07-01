@@ -5,19 +5,15 @@ import com.example.spring_boot_learning.database.model.RefreshTokens
 import com.example.spring_boot_learning.database.model.User
 import com.example.spring_boot_learning.database.repository.RefreshTokenRepository
 import com.example.spring_boot_learning.database.repository.UserRepository
-import io.jsonwebtoken.security.Password
 import org.bson.types.ObjectId
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import java.lang.reflect.Method
 import java.security.MessageDigest
 import java.time.Instant
 import java.util.Base64
-import kotlin.math.log
 
 @Service
 class AuthService(
