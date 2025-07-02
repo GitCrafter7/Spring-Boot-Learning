@@ -8,6 +8,7 @@ interface ProductRepository: MongoRepository<Product, ObjectId> , ProductReposit
     fun findByRatingGreaterThanEqual(rating: Double): List<Product>
     fun findByPriceLessThan(price : Double): List<Product>
     fun findFirstByOrderByPriceDesc() : List<Product>
+    fun findByPriceBetween(minPrice: Double?, maxPrice: Double?): List<Product>
 
 }
 

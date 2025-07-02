@@ -6,6 +6,7 @@ import com.example.spring_boot_learning.database.model.toProductResponse
 import com.example.spring_boot_learning.database.repository.ProductRepository
 import com.example.spring_boot_learning.database.repository.UserRepository
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
@@ -34,6 +35,14 @@ class ProductController(
         val stock: Int = 0,
         val brand: String,
         val rating: Double
+    )
+
+    data class PriceRangeRequest(
+        @field:NotNull(message = "maxPrice is required")
+        val maxPrice: Double?,
+
+        @field:NotNull(message = "minPrice is required")
+        val minPrice: Double?
     )
 
     @PostMapping("/add")
@@ -100,7 +109,7 @@ class ProductController(
             }
 
 
-            val products = productRepository.findAll().map{
+            val products = productRepository.findAll().map {
                 it.toProductResponse()
             }  // Correct repository used here
             if (products.isEmpty()) {
@@ -176,14 +185,15 @@ class ProductController(
     @DeleteMapping("/{id}")
     fun deleteProductById(
         @AuthenticationPrincipal principal: Any,
-        @PathVariable id:String): ResponseEntity<GenericResponse?> {
+        @PathVariable id: String
+    ): ResponseEntity<GenericResponse?> {
         return try {
             val userId = principal.toString()
             val user = userRepository.findById(ObjectId(userId)).orElseThrow {
                 RuntimeException("User not found")
             }
 
-            val product =  productRepository.findById(ObjectId(id)).orElseThrow{
+            val product = productRepository.findById(ObjectId(id)).orElseThrow {
                 RuntimeException("Product Doesn't Exist")
             }
             productRepository.deleteById(ObjectId(id))
@@ -193,9 +203,9 @@ class ProductController(
                     message = "Deleted Successfully",
                 )
             )
-        }catch (
+        } catch (
             e: Exception
-        ){
+        ) {
             ResponseEntity.status(500).body(
                 GenericResponse(
                     status = 500,
@@ -211,7 +221,8 @@ class ProductController(
     @GetMapping("/search")
     fun getProductById(
         @AuthenticationPrincipal principal: Any,
-        @RequestParam id: String): ResponseEntity<GenericResponse> {
+        @RequestParam id: String
+    ): ResponseEntity<GenericResponse> {
         return try {
             val product = productRepository.findById(ObjectId(id)).orElseThrow {
                 RuntimeException("Product not found")
@@ -223,9 +234,9 @@ class ProductController(
                     data = product
                 )
             )
-        }catch (
+        } catch (
             e: Exception
-        ){
+        ) {
             ResponseEntity.status(404).body(
                 GenericResponse(
                     status = 404,
@@ -234,5 +245,39 @@ class ProductController(
                 )
             )
         }
+    }
+
+    @PostMapping("/price-range")
+    fun getProductByPriceRange(
+        @AuthenticationPrincipal principal: Any,
+        @Valid @RequestBody body: PriceRangeRequest
+    ): ResponseEntity<GenericResponse?> {
+        return try {
+            val userId = principal.toString()
+            val user = userRepository.findById(ObjectId(userId)).orElseThrow {
+                RuntimeException("User not found")
+            }
+            val products = productRepository.findByPriceBetween(
+                minPrice = body.minPrice,
+                maxPrice = body.maxPrice
+            ).map { it.toProductResponse() }
+
+            ResponseEntity.ok(
+                GenericResponse(
+                    status = 200,
+                    message = "Products fetched successfully",
+                    data = products
+                )
+            )
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(
+                GenericResponse(
+                    status = 500,
+                    message = "Failed to fetch products by price range: ${e.message}"
+                )
+            )
+        }
+
+
     }
 }
